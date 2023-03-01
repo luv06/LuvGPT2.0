@@ -1,0 +1,29 @@
+name: Deploy Chat GPT Telegram Bot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: LuvGPT_bot:latest
+
+      - name: Run Docker container
+        uses: docker/compose-action@1.28.6
+        with:
+          compose-file: docker-compose.yml
+          service: bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OPENAI_API_SECRET_KEY: ${{ secrets.OPENAI_API_SECRET_KEY }}
